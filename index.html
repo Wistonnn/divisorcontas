@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisão de Contas | Acessibilidade</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        // Funções críticas carregadas imediatamente
+        function toggleOfflineMode() {
+            const current = localStorage.getItem('bill-splitter-offline') === 'true';
+            localStorage.setItem('bill-splitter-offline', !current);
+            location.reload();
+        }
+    </script>
+</head>
+
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-titles">
+                <h1>Dashboard de Contas</h1>
+                <p class="subtitle" id="user-email">Carregando...</p>
+            </div>
+            <div class="header-actions">
+                <div id="status-badge" class="status-badge online">ONLINE</div>
+                <button id="btn-logout" class="btn-small btn-cancel" onclick="handleLogout()"
+                    style="display:none;">Sair</button>
+                <button class="btn-small btn-outline" onclick="toggleOfflineMode()">Trocar Online/Offline</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-icon">💎</div>
+            <h2>Bem-vindo</h2>
+            <p class="login-subtitle">Acesse sua conta para gerenciar despesas</p>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <label for="login-email">E-mail</label>
+                <input type="email" id="login-email" placeholder="seu@email.com" required autocomplete="email">
+
+                <label for="login-password">Senha</label>
+                <input type="password" id="login-password" placeholder="••••••••" required
+                    autocomplete="current-password">
+
+                <div id="login-error" class="login-error" style="display:none;"></div>
+
+                <button type="submit" class="btn btn-primary" id="btn-login"
+                    style="width:100%; margin-top: 1.5rem; height: 3.5rem;">
+                    Acessar Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <main class="dashboard-container">
+
+        <section class="summary-section">
+            <h2 class="section-title">Resumo Financeiro</h2>
+            <div class="summary-grid">
+
+                <article class="summary-card total" aria-label="Valor total acumulado">
+                    <h3>Total Geral</h3>
+                    <div class="value" id="val-total-contas">R$ 0,00</div>
+                </article>
+
+                <article class="summary-card split" aria-label="Sua metade das despesas">
+                    <h3>Metade Paula</h3>
+                    <div class="value" id="val-metade">R$ 0,00</div>
+                </article>
+
+                <article class="summary-card paid" aria-label="Total já amortizado pela Paula">
+                    <h3>Total Pago</h3>
+                    <div class="value positive" id="val-pago">R$ 0,00</div>
+                </article>
+
+                <article class="summary-card residual" aria-label="Saldo atual">
+                    <h3>Saldo Paula</h3>
+                    <div class="value" id="val-residual">R$ 0,00</div>
+                </article>
+            </div>
+        </section>
+
+        <!-- AÇÕES -->
+        <section class="actions-section">
+            <button class="btn btn-primary" onclick="openModal('modal-conta')">📝 Adicionar Conta</button>
+            <button class="btn btn-outline" onclick="document.getElementById('ocr-input').click()">📷 Escanear
+                Fatura</button>
+            <input type="file" id="ocr-input" accept="image/*" style="display:none;" onchange="handleOCR(event)">
+            <button class="btn btn-secondary" onclick="openModal('modal-entrada')">💰 Registrar Pagamento</button>
+        </section>
+
+        <!-- COLUNAS DE DETALHAMENTO -->
+        <div class="details-grid">
+
+            <!-- CONTAS DE LUZ -->
+            <section class="list-section">
+                <header class="list-header luz">
+                    <div class="header-titles-group">
+                        <h2>Contas de Luz</h2>
+                        <div class="sort-controls">
+                            <button class="btn-sort" onclick="toggleSort('luz', 'date')" title="Ordenar por Data">📅</button>
+                            <button class="btn-sort" onclick="toggleSort('luz', 'amount')" title="Ordenar por Valor">💰</button>
+                        </div>
+                    </div>
+                    <span class="total-badge" id="total-luz">R$ 0,00</span>
+                </header>
+                <div class="list-body" id="list-luz">
+                    <!-- Cards de luz injetados aqui -->
+                </div>
+            </section>
+
+            <!-- CONTAS DE ÁGUA -->
+            <section class="list-section">
+                <header class="list-header agua">
+                    <div class="header-titles-group">
+                        <h2>Contas de Água</h2>
+                        <div class="sort-controls">
+                            <button class="btn-sort" onclick="toggleSort('agua', 'date')" title="Ordenar por Data">📅</button>
+                            <button class="btn-sort" onclick="toggleSort('agua', 'amount')" title="Ordenar por Valor">💰</button>
+                        </div>
+                    </div>
+                    <span class="total-badge" id="total-agua">R$ 0,00</span>
+                </header>
+                <div class="list-body" id="list-agua">
+                    <!-- Cards de agua injetados aqui -->
+                </div>
+            </section>
+
+            <!-- ENTRADAS (PAGAMENTOS) -->
+            <section class="list-section">
+                <header class="list-header entradas">
+                    <div class="header-titles-group">
+                        <h2>Pagamentos Paula</h2>
+                        <div class="sort-controls">
+                            <button class="btn-sort" onclick="toggleSort('entradas', 'date')" title="Ordenar por Data">📅</button>
+                            <button class="btn-sort" onclick="toggleSort('entradas', 'amount')" title="Ordenar por Valor">💰</button>
+                        </div>
+                    </div>
+                    <span class="total-badge" id="total-entradas">R$ 0,00</span>
+                </header>
+                <div class="list-body" id="list-entradas">
+                    <!-- Cards de entradas injetados aqui -->
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- MODAL: NOVA CONTA -->
+    <div id="modal-conta" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Nova Conta Fixa</h2>
+            <form id="form-conta" onsubmit="handleNovaConta(event)">
+                <label for="tipo-conta">Tipo de Conta:</label>
+                <select id="tipo-conta" required>
+                    <option value="luz">💡 Conta de Energia (Luz)</option>
+                    <option value="agua">💧 Conta de Água</option>
+                </select>
+
+                <label for="mes-conta">Mês de Referência:</label>
+                <input type="text" id="mes-conta" placeholder="Ex: Maio" required>
+
+                <label for="venc-conta">Vencimento (Dia/Mês):</label>
+                <input type="text" id="venc-conta" placeholder="Ex: 07/05" required>
+
+                <label for="valor-conta">Valor da Conta (R$):</label>
+                <input type="number" step="0.01" id="valor-conta" placeholder="Ex: 150.00" required>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal('modal-conta')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-conta">Salvar Conta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVA ENTRADA -->
+    <div id="modal-entrada" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Novo Pagamento da Paula</h2>
+            <form id="form-entrada" onsubmit="handleNovaEntrada(event)">
+                <label for="data-entrada">Data do Pagamento:</label>
+                <input type="text" id="data-entrada" placeholder="Ex: 10/05" required>
+
+                <label for="valor-entrada">Valor Pago (R$):</label>
+                <input type="number" step="0.01" id="valor-entrada" placeholder="Ex: 200.00" required>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal('modal-entrada')">Cancelar</button>
+                    <button type="submit" class="btn btn-secondary" id="btn-save-entrada">Registrar Pagamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay para OCR -->
+    <div id="loading-overlay" style="display:none;">
+        <div class="spinner"></div>
+        <div class="loading-text">Processando Fatura</div>
+        <div class="loading-subtitle">A inteligência artificial está lendo os dados...</div>
+    </div>
+
+    <!-- SUPABASE CLIENT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js?v=2"></script>
+</body>
+
+</html>
