@@ -105,6 +105,11 @@
                         <div class="sort-controls">
                             <button class="btn-sort" onclick="toggleSort('luz', 'date')" title="Ordenar por Data">📅</button>
                             <button class="btn-sort" onclick="toggleSort('luz', 'amount')" title="Ordenar por Valor">💰</button>
+                            <select class="select-filter" id="filter-luz" onchange="toggleFilter('luz', this.value)" title="Filtrar Contas">
+                                <option value="todas">Todas</option>
+                                <option value="pendentes">A Pagar</option>
+                                <option value="pagas">Pagas</option>
+                            </select>
                         </div>
                     </div>
                     <span class="total-badge" id="total-luz">R$ 0,00</span>
@@ -122,6 +127,11 @@
                         <div class="sort-controls">
                             <button class="btn-sort" onclick="toggleSort('agua', 'date')" title="Ordenar por Data">📅</button>
                             <button class="btn-sort" onclick="toggleSort('agua', 'amount')" title="Ordenar por Valor">💰</button>
+                            <select class="select-filter" id="filter-agua" onchange="toggleFilter('agua', this.value)" title="Filtrar Contas">
+                                <option value="todas">Todas</option>
+                                <option value="pendentes">A Pagar</option>
+                                <option value="pagas">Pagas</option>
+                            </select>
                         </div>
                     </div>
                     <span class="total-badge" id="total-agua">R$ 0,00</span>

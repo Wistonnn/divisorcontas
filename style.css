@@ -281,6 +281,29 @@ body {
     box-shadow: 0 0 10px var(--color-accent-glow);
 }
 
+.select-filter {
+    background: hsla(0, 0%, 100%, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    outline: none;
+}
+
+.select-filter:hover {
+    background: hsla(217, 91%, 60%, 0.1);
+    border-color: var(--color-accent);
+}
+
+.select-filter option {
+    background-color: hsl(222, 47%, 11%);
+    color: var(--text-primary);
+}
+
 .list-body {
     padding: 1rem;
     display: flex;

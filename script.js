@@ -18,6 +18,7 @@ let isInitializing = false;
 // Estado Global
 let isOfflineMode = localStorage.getItem('bill-splitter-offline') === 'true';
 let sortConfig = JSON.parse(localStorage.getItem('bs-sort-config') || '{"luz":{"field":"date","asc":false},"agua":{"field":"date","asc":false},"entradas":{"field":"date","asc":false}}');
+let filterConfig = JSON.parse(localStorage.getItem('bs-filter-config') || '{"luz":"todas","agua":"todas"}');
 
 // ==========================================
 // SERVIÇO DE DADOS (ABSTRAÇÃO)
@@ -174,6 +175,12 @@ function toggleSort(listKey, field) {
         sortConfig[listKey].asc = field === 'amount' ? false : true; // Valor default desc, Data default asc
     }
     localStorage.setItem('bs-sort-config', JSON.stringify(sortConfig));
+    initApp();
+}
+
+function toggleFilter(listKey, value) {
+    filterConfig[listKey] = value;
+    localStorage.setItem('bs-filter-config', JSON.stringify(filterConfig));
     initApp();
 }
 
@@ -473,8 +480,29 @@ async function initApp() {
         updateSortButtons('agua');
         updateSortButtons('entradas');
 
-        renderList('list-luz', luz);
-        renderList('list-agua', agua);
+        // Atualiza os valores dos filtros na tela
+        const elFilterLuz = document.getElementById('filter-luz');
+        const elFilterAgua = document.getElementById('filter-agua');
+        if (elFilterLuz) elFilterLuz.value = filterConfig.luz;
+        if (elFilterAgua) elFilterAgua.value = filterConfig.agua;
+
+        // Filtra as listas para exibição
+        let filteredLuz = [...luz];
+        if (filterConfig.luz === 'pendentes') {
+            filteredLuz = filteredLuz.filter(b => !b.is_paid);
+        } else if (filterConfig.luz === 'pagas') {
+            filteredLuz = filteredLuz.filter(b => b.is_paid);
+        }
+
+        let filteredAgua = [...agua];
+        if (filterConfig.agua === 'pendentes') {
+            filteredAgua = filteredAgua.filter(b => !b.is_paid);
+        } else if (filterConfig.agua === 'pagas') {
+            filteredAgua = filteredAgua.filter(b => b.is_paid);
+        }
+
+        renderList('list-luz', filteredLuz);
+        renderList('list-agua', filteredAgua);
         renderList('list-entradas', payments, true);
         calculateDashboard(luz, agua, payments);
 
