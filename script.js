@@ -163,7 +163,10 @@ function parseDate(dateStr) {
     const parts = dateStr.split('/');
     const day = parseInt(parts[0]);
     const month = parseInt(parts[1]) - 1;
-    const year = parts[2] ? parseInt(parts[2]) : new Date().getFullYear();
+    let year = parts[2] ? parseInt(parts[2]) : new Date().getFullYear();
+    if (year < 100) {
+        year += 2000;
+    }
     return new Date(year, month, day);
 }
 
